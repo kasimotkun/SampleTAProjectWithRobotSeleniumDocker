@@ -1,0 +1,33 @@
+#docker-compose file
+#To execute this docker-compose yml file use docker-compose up -d
+
+#selenium-hub: equivalent to manually running the command docker run -d -p 4444:4444 --name selenium-hub  -P selenium/hub
+selenium-hub:
+  restart: always
+  environment:
+    - GRID_MAX_SESSION=5
+    - GRID_BROWSER_TIMEOUT=10000
+    - GRID_TIMEOUT=300000
+    - GRID_NEW_SESSION_WAIT_TIMEOUT=30000
+  image: selenium/hub:latest
+  ports:
+    - "4444:4444"
+#selenium-chrome equivalent to manually running the command docker run -d --link selenium-hub:hub -P --name chrome selenium/node-chrome-debug
+selenium-chrome:
+  restart: always
+  image: selenium/node-chrome-debug:3.0.1-dysprosium
+  stdin_open: true
+  ports:
+    - "4577"
+  volumes:
+    - /dev/shm:/dev/shm
+  links:
+    - selenium-hub:hub
+#selenium-firefox equivalent to manually running the command docker run -d --link selenium-hub:hub -P --name firefox selenium/node-firefox-debug
+selenium-firefox:
+  restart: always
+  image: selenium/node-firefox-debug:2.53.1-americium
+  ports:
+    - "4578"
+  links:
+    - selenium-hub:hub
